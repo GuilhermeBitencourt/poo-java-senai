@@ -244,7 +244,7 @@ public class Main {
 
     private static void alterarValores(Clinica clinica, Scanner scanner) {
         System.out.println("Selecione o valor a ser alterado (consulta ou exames):");
-        String valorAlterado = scanner.nextLine().trim().toLowerCase();
+        String valorAlterado = scanner.nextLine().toLowerCase();
 
         System.out.println("Novo valor:");
         double novoValor = Double.parseDouble(scanner.nextLine().trim());
