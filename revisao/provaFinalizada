@@ -1,0 +1,266 @@
+import java.time.LocalDate;
+
+public class Paciente {
+    private String CPF;
+    private String nome;
+    private LocalDate dataNascimento;
+    private String planoSaude;
+
+    public Paciente(String CPF, String nome, LocalDate dataNascimento, String planoSaude) {
+        if (dataNascimento.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Data de nascimento inválida.");
+        }
+        this.CPF = CPF;
+        this.nome = nome;
+        this.dataNascimento = dataNascimento;
+        this.planoSaude = planoSaude;
+    }
+
+    public String getCPF() {
+        return CPF;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public String getPlanoSaude() {
+        return planoSaude;
+    }
+}
+
+import java.time.LocalDate;
+
+public class Consulta {
+    private Paciente paciente;
+    private LocalDate dataAtendimento;
+    private String localAtendimento;
+    private double valorConsulta;
+
+    public Consulta(Paciente paciente, LocalDate dataAtendimento, String localAtendimento, double valorConsulta) {
+        if (dataAtendimento.isAfter(LocalDate.now()) || valorConsulta < 0) {
+            throw new IllegalArgumentException("Data ou valor inválido para a consulta.");
+        }
+        this.paciente = paciente;
+        this.dataAtendimento = dataAtendimento;
+        this.localAtendimento = localAtendimento;
+        this.valorConsulta = valorConsulta;
+    }
+
+    public Paciente getPaciente() {
+        return paciente;
+    }
+
+    public LocalDate getDataAtendimento() {
+        return dataAtendimento;
+    }
+
+    public String getLocalAtendimento() {
+        return localAtendimento;
+    }
+
+    public double getValorConsulta() {
+        return valorConsulta;
+    }
+}
+
+import java.time.LocalDate;
+
+public class Checkup extends Consulta {
+    private double valorAdicional;
+
+    public Checkup(Paciente paciente, LocalDate dataAtendimento, String localAtendimento, double valorConsulta, double valorAdicional) {
+        super(paciente, dataAtendimento, localAtendimento, valorConsulta);
+        if (valorAdicional < 0 || valorConsulta < 0) {
+            throw new IllegalArgumentException("Valor inválido para check-up.");
+        }
+        this.valorAdicional = valorAdicional;
+    }
+
+    public double getValorAdicional() {
+        return valorAdicional;
+    }
+
+    @Override
+    public double getValorConsulta() {
+        return super.getValorConsulta() + valorAdicional;
+    }
+
+    public double getValorDescontoSenai() {
+        if (getPaciente().getPlanoSaude().equalsIgnoreCase("PlanSenai")) {
+            return getValorConsulta() * 0.85; // Desconto de 15% para PlanSenai
+        } else {
+            return getValorConsulta();
+        }
+    }
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Clinica {
+    private String nome;
+    private String endereco;
+    private String cnpj;
+    private double valorConsultaSimples;
+    private double valorAdicionalExames;
+    private List<Consulta> atendimentosRealizados;
+
+    public Clinica(String nome, String endereco, String cnpj, double valorConsultaSimples, double valorAdicionalExames) {
+        if (valorConsultaSimples < 0 || valorAdicionalExames < 0) {
+            throw new IllegalArgumentException("Valores inválidos para consulta simples ou adicional para exames.");
+        }
+        this.nome = nome;
+        this.endereco = endereco;
+        this.cnpj = cnpj;
+        this.valorConsultaSimples = valorConsultaSimples;
+        this.valorAdicionalExames = valorAdicionalExames;
+        this.atendimentosRealizados = new ArrayList<>();
+    }
+
+    public double getValorConsultaSimples() {
+        return valorConsultaSimples;
+    }
+
+    public double getValorAdicionalExames() {
+        return valorAdicionalExames;
+    }
+
+    public double getValorTotal() {
+        double valorTotal = 0;
+        for (Consulta consulta : atendimentosRealizados) {
+            valorTotal += consulta.getValorConsulta();
+        }
+        return valorTotal;
+    }
+
+    public void alterarValorConsultaSimples(double novoValor) {
+        if (novoValor >= 0) {
+            this.valorConsultaSimples = novoValor;
+        } else {
+            throw new IllegalArgumentException("Novo valor inválido para consulta simples.");
+        }
+    }
+
+    public void alterarValorAdicionalExames(double novoValor) {
+        if (novoValor >= 0) {
+            this.valorAdicionalExames = novoValor;
+        } else {
+            throw new IllegalArgumentException("Novo valor inválido para adicional de exames.");
+        }
+    }
+
+    public void realizarAtendimento(Consulta atendimento) {
+        atendimentosRealizados.add(atendimento);
+    }
+}
+
+import java.time.LocalDate;
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        
+        Clinica clinicaSenai = new Clinica("Senai Saúde", "Av Dendezeiros, 188, Bonfim", "123456789",
+                75.0, 150.0);
+
+        while (true) {
+            System.out.println("\nSelecione uma opção:");
+            System.out.println("a. Realizar atendimento");
+            System.out.println("b. Consultar a média de valor dos atendimentos realizados");
+            System.out.println("c. Alterar o valor da consulta simples ou o adicional para exames");
+            System.out.println("d. Sair");
+
+            String opcao = scanner.nextLine().trim().toLowerCase();
+
+            switch (opcao) {
+                case "a":
+                    realizarAtendimento(clinicaSenai, scanner);
+                    break;
+                case "b":
+                    consultarMediaAtendimentos(clinicaSenai);
+                    break;
+                case "c":
+                    alterarValores(clinicaSenai, scanner);
+                    break;
+                case "d":
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+        }
+    }
+
+    private static void realizarAtendimento(Clinica clinica, Scanner scanner) {
+        System.out.println("Tipo de atendimento (consulta simples ou check-up):");
+        String tipoAtendimento = scanner.nextLine().trim().toLowerCase();
+
+        System.out.println("CPF do paciente:");
+        String cpf = scanner.nextLine().trim();
+
+        System.out.println("Nome do paciente:");
+        String nome = scanner.nextLine().trim();
+
+        System.out.println("Data de nascimento do paciente (Formato: YYYY-MM-DD):");
+        String dataNascimentoStr = scanner.nextLine().trim();
+        LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr);
+
+        System.out.println("Plano de saúde do paciente:");
+        String planoSaude = scanner.nextLine().trim();
+
+        Paciente paciente = new Paciente(cpf, nome, dataNascimento, planoSaude);
+
+        try {
+            if (tipoAtendimento.equals("consulta simples")) {
+                Consulta consulta = new Consulta(paciente, LocalDate.now(), "Local", clinica.getValorConsultaSimples());
+                clinica.realizarAtendimento(consulta);
+                System.out.println("Atendimento realizado. Valor do atendimento: " + consulta.getValorConsulta());
+            } else if (tipoAtendimento.equals("check-up")) {
+                System.out.println("Valor adicional para exames:");
+                double valorAdicional = Double.parseDouble(scanner.nextLine().trim());
+                Checkup checkup = new Checkup(paciente, LocalDate.now(), "Local", clinica.getValorConsultaSimples(), valorAdicional);
+                clinica.realizarAtendimento(checkup);
+                System.out.println("Atendimento realizado. Valor do atendimento: " + checkup.getValorConsulta());
+            } else {
+                System.out.println("Tipo de atendimento inválido.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Não foi possível realizar o atendimento: " + e.getMessage());
+        }
+    }
+
+    private static void consultarMediaAtendimentos(Clinica clinica) {
+        double media = clinica.getValorTotal() / clinica.getAtendimentosRealizados().size();
+        System.out.println("Média de valor dos atendimentos realizados: " + media);
+    }
+
+    private static void alterarValores(Clinica clinica, Scanner scanner) {
+        System.out.println("Selecione o valor a ser alterado (consulta ou exames):");
+        String valorAlterado = scanner.nextLine().trim().toLowerCase();
+
+        System.out.println("Novo valor:");
+        double novoValor = Double.parseDouble(scanner.nextLine().trim());
+
+        try {
+            if (valorAlterado.equals("consulta")) {
+                clinica.alterarValorConsultaSimples(novoValor);
+                System.out.println("Valor da consulta simples alterado com sucesso.");
+            } else if (valorAlterado.equals("exames")) {
+                clinica.alterarValorAdicionalExames(novoValor);
+                System.out.println("Valor adicional para exames alterado com sucesso.");
+            } else {
+                System.out.println("Opção inválida.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Não foi possível alterar o valor: " + e.getMessage());
+        }
+    }
+}
