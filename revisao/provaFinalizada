@@ -247,7 +247,7 @@ public class Main {
         String valorAlterado = scanner.nextLine().toLowerCase();
 
         System.out.println("Novo valor:");
-        double novoValor = Double.parseDouble(scanner.nextLine().trim());
+        double novoValor = Double.parseDouble(scanner.nextLine());
 
         try {
             if (valorAlterado.equals("consulta")) {
