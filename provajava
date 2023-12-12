@@ -1,0 +1,92 @@
+import java.time.LocalDate;
+
+public class Paciente {
+    private String CPF;
+    private String nome;
+    private LocalDate dataNascimento;
+    private String planoSaude;
+
+    public Paciente(String CPF, String nome, LocalDate dataNascimento, String planoSaude) {
+        if (dataNascimento.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Data de nascimento inválida.");
+        }
+        this.CPF = CPF;
+        this.nome = nome;
+        this.dataNascimento = dataNascimento;
+        this.planoSaude = planoSaude;
+    }
+
+    public String getCPF() {
+        return CPF;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public String getPlanoSaude() {
+        return planoSaude;
+    }
+}
+
+import java.time.LocalDate;
+
+public class Consulta {
+    private Paciente paciente;
+    private LocalDate dataAtendimento;
+    private String localAtendimento;
+    private double valorConsulta;
+
+    public Consulta(Paciente paciente, LocalDate dataAtendimento, String localAtendimento, double valorConsulta) {
+        if (dataAtendimento.isAfter(LocalDate.now()) || valorConsulta < 0) {
+            throw new IllegalArgumentException("Data ou valor inválido para a consulta.");
+        }
+        this.paciente = paciente;
+        this.dataAtendimento = dataAtendimento;
+        this.localAtendimento = localAtendimento;
+        this.valorConsulta = valorConsulta;
+    }
+
+    public Paciente getPaciente() {
+        return paciente;
+    }
+
+    public LocalDate getDataAtendimento() {
+        return dataAtendimento;
+    }
+
+    public String getLocalAtendimento() {
+        return localAtendimento;
+    }
+
+    public double getValorConsulta() {
+        return valorConsulta;
+    }
+}
+
+import java.time.LocalDate;
+
+public class Checkup extends Consulta {
+    private double valorAdicional;
+
+    public Checkup(Paciente paciente, LocalDate dataAtendimento, String localAtendimento, double valorConsulta, double valorAdicional) {
+        super(paciente, dataAtendimento, localAtendimento, valorConsulta);
+        if (valorAdicional < 0) {
+            throw new IllegalArgumentException("Valor adicional inválido para o check-up.");
+        }
+        this.valorAdicional = valorAdicional;
+    }
+
+    public double getValorAdicional() {
+        return valorAdicional;
+    }
+
+    @Override
+    public double getValorConsulta() {
+        return super.getValorConsulta() + valorAdicional;
+    }
+}
