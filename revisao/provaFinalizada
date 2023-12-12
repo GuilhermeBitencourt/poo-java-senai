@@ -178,7 +178,7 @@ public class Main {
             System.out.println("c. Alterar o valor da consulta simples ou o adicional para exames");
             System.out.println("d. Sair");
 
-            String opcao = scanner.nextLine().trim().toLowerCase();
+            String opcao = scanner.nextLine().toLowerCase();
 
             switch (opcao) {
                 case "a":
@@ -201,20 +201,20 @@ public class Main {
 
     private static void realizarAtendimento(Clinica clinica, Scanner scanner) {
         System.out.println("Tipo de atendimento (consulta simples ou check-up):");
-        String tipoAtendimento = scanner.nextLine().trim().toLowerCase();
+        String tipoAtendimento = scanner.nextLine().toLowerCase();
 
         System.out.println("CPF do paciente:");
         String cpf = scanner.nextLine().trim();
 
         System.out.println("Nome do paciente:");
-        String nome = scanner.nextLine().trim();
+        String nome = scanner.nextLine();
 
         System.out.println("Data de nascimento do paciente (Formato: YYYY-MM-DD):");
-        String dataNascimentoStr = scanner.nextLine().trim();
+        String dataNascimentoStr = scanner.nextLine();
         LocalDate dataNascimento = LocalDate.parse(dataNascimentoStr);
 
         System.out.println("Plano de saúde do paciente:");
-        String planoSaude = scanner.nextLine().trim();
+        String planoSaude = scanner.nextLine();
 
         Paciente paciente = new Paciente(cpf, nome, dataNascimento, planoSaude);
 
